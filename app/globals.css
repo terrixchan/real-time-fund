@@ -565,14 +565,14 @@ input[type="number"] {
 }
 
 .tab:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--primary);
+  background: rgba(34, 211, 238, 0.08);
 }
 
 .tab.active {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+  background: rgba(34, 211, 238, 0.15);
+  color: var(--primary);
+  box-shadow: none;
 }
 
 .modal-overlay {

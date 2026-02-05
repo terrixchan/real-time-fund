@@ -881,7 +881,6 @@ function HoldingEditModal({ fund, holding, onClose, onSave }) {
                 width: '100%',
                 border: !share ? '1px solid var(--danger)' : undefined
               }}
-              autoFocus
             />
           </div>
 
@@ -1543,7 +1542,7 @@ export default function HomePage() {
   const [editingGroup, setEditingGroup] = useState(null);
 
   // 排序状态
-  const [sortBy, setSortBy] = useState('default'); // default, name, yield, code
+  const [sortBy, setSortBy] = useState('default'); // default, name, yield, holding
 
   // 视图模式
   const [viewMode, setViewMode] = useState('card'); // card, list
@@ -1631,7 +1630,60 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, []);
 
-  // 过滤和排序后的基金列表
+    // 计算持仓收益
+    const getHoldingProfit = (fund, holding) => {
+        if (!holding || typeof holding.share !== 'number') return null;
+
+        const now = new Date();
+        const isAfter9 = now.getHours() >= 9;
+        const hasTodayData = fund.jzrq === todayStr;
+
+        // 如果是交易日且9点以后，且今日净值未出，则强制使用估值（隐藏涨跌幅列模式）
+        const useValuation = isTradingDay && isAfter9 && !hasTodayData;
+
+        let currentNav;
+        let profitToday;
+
+        if (!useValuation) {
+            // 使用确权净值 (dwjz)
+            currentNav = Number(fund.dwjz);
+            if (!currentNav) return null;
+
+            const amount = holding.share * currentNav;
+            // 优先用 zzl (真实涨跌幅), 降级用 gszzl
+            const rate = fund.zzl !== undefined ? Number(fund.zzl) : (Number(fund.gszzl) || 0);
+            profitToday = amount - (amount / (1 + rate / 100));
+        } else {
+            // 否则使用估值
+            currentNav = fund.estPricedCoverage > 0.05
+                ? fund.estGsz
+                : (typeof fund.gsz === 'number' ? fund.gsz : Number(fund.dwjz));
+
+            if (!currentNav) return null;
+
+            const amount = holding.share * currentNav;
+            // 估值涨跌幅
+            const gzChange = fund.estPricedCoverage > 0.05 ? fund.estGszzl : (Number(fund.gszzl) || 0);
+            profitToday = amount - (amount / (1 + gzChange / 100));
+        }
+
+        // 持仓金额
+        const amount = holding.share * currentNav;
+
+        // 总收益 = (当前净值 - 成本价) * 份额
+        const profitTotal = typeof holding.cost === 'number'
+            ? (currentNav - holding.cost) * holding.share
+            : null;
+
+        return {
+            amount,
+            profitToday,
+            profitTotal
+        };
+    };
+
+
+    // 过滤和排序后的基金列表
   const displayFunds = funds
     .filter(f => {
       if (currentTab === 'all') return true;
@@ -1645,8 +1697,13 @@ export default function HomePage() {
         const valB = typeof b.estGszzl === 'number' ? b.estGszzl : (Number(b.gszzl) || 0);
         return valB - valA;
       }
-      if (sortBy === 'name') return a.name.localeCompare(b.name, 'zh-CN');
-      if (sortBy === 'code') return a.code.localeCompare(b.code);
+      if (sortBy === 'holding') {
+        const pa = getHoldingProfit(a, holdings[a.code]);
+        const pb = getHoldingProfit(b, holdings[b.code]);
+        const valA = pa?.profitTotal ?? Number.NEGATIVE_INFINITY;
+        const valB = pb?.profitTotal ?? Number.NEGATIVE_INFINITY;
+        return valB - valA;
+      }
       return 0;
     });
 
@@ -1669,58 +1726,6 @@ export default function HomePage() {
   const [tabsOverflow, setTabsOverflow] = useState(false);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
-
-  // 计算持仓收益
-  const getHoldingProfit = (fund, holding) => {
-    if (!holding || typeof holding.share !== 'number') return null;
-    
-    const now = new Date();
-    const isAfter9 = now.getHours() >= 9;
-    const hasTodayData = fund.jzrq === todayStr;
-    
-    // 如果是交易日且9点以后，且今日净值未出，则强制使用估值（隐藏涨跌幅列模式）
-    const useValuation = isTradingDay && isAfter9 && !hasTodayData;
-
-    let currentNav;
-    let profitToday;
-
-    if (!useValuation) {
-      // 使用确权净值 (dwjz)
-      currentNav = Number(fund.dwjz);
-      if (!currentNav) return null;
-
-      const amount = holding.share * currentNav;
-      // 优先用 zzl (真实涨跌幅), 降级用 gszzl
-      const rate = fund.zzl !== undefined ? Number(fund.zzl) : (Number(fund.gszzl) || 0);
-      profitToday = amount - (amount / (1 + rate / 100));
-    } else {
-      // 否则使用估值
-      currentNav = fund.estPricedCoverage > 0.05 
-        ? fund.estGsz 
-        : (typeof fund.gsz === 'number' ? fund.gsz : Number(fund.dwjz));
-      
-      if (!currentNav) return null;
-
-      const amount = holding.share * currentNav;
-      // 估值涨跌幅
-      const gzChange = fund.estPricedCoverage > 0.05 ? fund.estGszzl : (Number(fund.gszzl) || 0);
-      profitToday = amount - (amount / (1 + gzChange / 100));
-    }
-      
-    // 持仓金额
-    const amount = holding.share * currentNav;
-    
-    // 总收益 = (当前净值 - 成本价) * 份额
-    const profitTotal = typeof holding.cost === 'number' 
-      ? (currentNav - holding.cost) * holding.share
-      : null;
-
-    return {
-      amount,
-      profitToday,
-      profitTotal
-    };
-  };
 
   const handleSaveHolding = (code, data) => {
     setHoldings(prev => {
@@ -2857,8 +2862,7 @@ export default function HomePage() {
                     {[
                       { id: 'default', label: '默认' },
                       { id: 'yield', label: '涨跌幅' },
-                      { id: 'name', label: '名称' },
-                      { id: 'code', label: '代码' }
+                      { id: 'holding', label: '持有收益' },
                     ].map((s) => (
                       <button
                         key={s.id}
@@ -3400,7 +3404,7 @@ export default function HomePage() {
             >
               <div className="title" style={{ marginBottom: 20, justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span>☕ 请我喝杯咖啡</span>
+                  <span>☕ 请作者喝杯咖啡</span>
                 </div>
                 <button className="icon-button" onClick={() => setDonateOpen(false)} style={{ border: 'none', background: 'transparent' }}>
                   <CloseIcon width="20" height="20" />
