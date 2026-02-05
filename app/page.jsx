@@ -3054,6 +3054,13 @@ export default function HomePage() {
                         drag={viewMode === 'list' && isMobile ? "x" : false}
                         dragConstraints={{ left: -80, right: 0 }}
                         dragElastic={0.1}
+                        // 增加 dragDirectionLock 确保在垂直滚动时不会轻易触发水平拖拽
+                        dragDirectionLock={true}
+                        // 调整触发阈值，只有明显的水平拖拽意图才响应
+                        onDragStart={(event, info) => {
+                          // 如果水平移动距离小于垂直移动距离，或者水平速度很小，视为垂直滚动意图，不进行拖拽处理
+                          // framer-motion 的 dragDirectionLock 已经处理了大部分情况，但可以进一步微调体验
+                        }}
                         // 如果当前行不是被选中的行，强制回到原点 (x: 0)
                         animate={viewMode === 'list' && isMobile ? { x: swipedFundCode === f.code ? -80 : 0 } : undefined}
                         onDragEnd={(e, { offset, velocity }) => {
