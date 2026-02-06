@@ -1,0 +1,28 @@
+<view class="page">
+  <view class="title">关于与说明</view>
+
+  <view class="section">
+    <view class="section-title">关于本工具</view>
+    <view class="section-text">
+      本小程序用于展示与记录基金的公开估值与涨跌数据，帮助理解市场波动情况。
+      所有信息均来源于公开渠道的整理与计算结果。
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">使用说明</view>
+    <view class="section-text">
+      本工具仅提供数据展示与自选记录功能，不提供任何投资建议，
+      不构成对任何金融产品的推荐或评价。
+      使用者应基于自身情况独立判断并承担相应风险。
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">风险提示</view>
+    <view class="section-text">
+      金融市场存在不确定性，历史数据与实时估值不代表未来表现。
+      请谨慎决策。
+    </view>
+  </view>
+</view>

@@ -42,4 +42,6 @@
     </block>
     <view wx:else class="empty">暂无基金，请先添加基金代码。</view>
   </view>
+
+  <navigator url="/pages/about/index" class="about-link">数据说明与风险提示</navigator>
 </view>
