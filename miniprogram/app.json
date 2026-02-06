@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "实时基金估值",
+    "navigationBarBackgroundColor": "#0b111f",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0b111f",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
