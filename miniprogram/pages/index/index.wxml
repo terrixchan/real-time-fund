@@ -1,0 +1,45 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">实时基金估值</view>
+    <view class="text-muted">原生小程序版本，无需 WebView</view>
+    <view class="flex" style="margin-top: 20rpx; gap: 16rpx;">
+      <input class="input" type="number" maxlength="6" placeholder="输入 6 位基金代码" value="{{inputCode}}" bindinput="onInputChange" />
+      <button class="button" bindtap="onAddFund">添加</button>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="flex-between" style="margin-bottom: 16rpx;">
+      <view>
+        <view class="section-title">刷新设置</view>
+        <view class="text-muted">自动刷新间隔：{{refreshInterval}} 秒</view>
+      </view>
+      <button class="button secondary" bindtap="onManualRefresh">手动刷新</button>
+    </view>
+    <picker mode="selector" range="{{intervalOptions}}" range-key="label" bindchange="onIntervalChange">
+      <view class="button">更改间隔</view>
+    </picker>
+  </view>
+
+  <view class="card">
+    <view class="section-title">基金列表</view>
+    <block wx:if="{{funds.length}}">
+      <block wx:for="{{funds}}" wx:key="code">
+        <view class="list-item">
+          <view class="flex-between">
+            <view>
+              <view>{{item.name || '--'}} ({{item.code}})</view>
+              <view class="text-muted">估值时间：{{item.time || '--'}}</view>
+            </view>
+            <view class="badge {{item.changeClass}}">{{item.changeText}}</view>
+          </view>
+          <view class="flex-between" style="margin-top: 12rpx;">
+            <view class="text-muted">估值净值：{{item.estimate || '--'}}</view>
+            <button class="button secondary" data-code="{{item.code}}" bindtap="onRemoveFund">移除</button>
+          </view>
+        </view>
+      </block>
+    </block>
+    <view wx:else class="empty">暂无基金，请先添加基金代码。</view>
+  </view>
+</view>

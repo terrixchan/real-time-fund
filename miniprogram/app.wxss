@@ -1,0 +1,89 @@
+page {
+  background: #0b111f;
+  color: #f2f5ff;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', sans-serif;
+}
+
+.container {
+  padding: 24rpx;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 20rpx 40rpx rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.text-muted {
+  color: rgba(242, 245, 255, 0.65);
+  font-size: 24rpx;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.button {
+  background: #3a7afe;
+  color: #fff;
+  border-radius: 14rpx;
+  padding: 12rpx 24rpx;
+  font-size: 26rpx;
+}
+
+.button.secondary {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.input {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 14rpx;
+  padding: 16rpx 20rpx;
+  color: #fff;
+  font-size: 26rpx;
+  flex: 1;
+}
+
+.badge {
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+}
+
+.badge.up {
+  background: rgba(37, 184, 92, 0.2);
+  color: #63e39c;
+}
+
+.badge.down {
+  background: rgba(239, 64, 64, 0.2);
+  color: #ff7e7e;
+}
+
+.list-item {
+  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+  padding-top: 16rpx;
+  margin-top: 16rpx;
+}
+
+.empty {
+  text-align: center;
+  padding: 60rpx 0 40rpx;
+  color: rgba(242, 245, 255, 0.6);
+}

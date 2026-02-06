@@ -1,0 +1,10 @@
+@import "../../app.wxss";
+
+button {
+  border: none;
+  line-height: normal;
+}
+
+button::after {
+  border: none;
+}
