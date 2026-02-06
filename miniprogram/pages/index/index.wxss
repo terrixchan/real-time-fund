@@ -8,3 +8,11 @@ button {
 button::after {
   border: none;
 }
+
+.about-link {
+  display: block;
+  text-align: center;
+  margin: 12rpx 0 6rpx;
+  font-size: 22rpx;
+  color: rgba(242, 245, 255, 0.5);
+}
