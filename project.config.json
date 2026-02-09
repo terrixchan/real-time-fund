@@ -1,0 +1,6 @@
+{
+  "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "cloudbaseEnvId": "cloud1-6gov01mkc0cce40b",
+  "cloudbaseRoot": "cloudfunctions/"
+}
