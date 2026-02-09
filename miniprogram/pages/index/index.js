@@ -1,4 +1,4 @@
-const FUND_API = 'https://fundgz.1234567.com.cn/js/';
+import { getFundGz } from '../../utils/fund';
 
 const intervalOptions = [
   { label: '5 秒', value: 5 },
@@ -115,32 +115,12 @@ Page({
     this.data.funds.forEach((item) => this.fetchFund(item.code));
   },
 
-  fetchFund(code) {
-    wx.request({
-      url: `${FUND_API}${code}.js?rt=${Date.now()}`,
-      method: 'GET',
-      dataType: 'text',
-      success: (res) => {
-        const parsed = this.parseJsonp(res.data);
-        if (!parsed) {
-          return;
-        }
-        this.updateFundItem(code, parsed);
-      },
-      fail: () => {
-        wx.showToast({ title: `基金 ${code} 获取失败`, icon: 'none' });
-      }
-    });
-  },
-
-  parseJsonp(data) {
-    if (typeof data !== 'string') return null;
-    const match = data.match(/jsonpgz\((.*)\);/);
-    if (!match || !match[1]) return null;
+  async fetchFund(code) {
     try {
-      return JSON.parse(match[1]);
+      const data = await getFundGz(code);
+      this.updateFundItem(code, data);
     } catch (error) {
-      return null;
+      wx.showToast({ title: `基金 ${code} 获取失败`, icon: 'none' });
     }
   },
 
