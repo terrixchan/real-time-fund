@@ -1,4 +1,4 @@
-export async function getFundGz(code) {
+async function getFundGz(code) {
   const res = await wx.cloud.callFunction({
     name: 'fundProxy',
     data: { code }
@@ -8,3 +8,5 @@ export async function getFundGz(code) {
   }
   return res.result.data;
 }
+
+module.exports.getFundGz = getFundGz;

@@ -1,4 +1,4 @@
-import { getFundGz } from '../../utils/fund';
+const { getFundGz } = require('../../utils/fund');
 
 const intervalOptions = [
   { label: '5 秒', value: 5 },
