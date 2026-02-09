@@ -1,67 +1,36 @@
-const cloud = require('wx-server-sdk');
-const https = require('https');
+// cloudfunctions/fundProxy/index.js
+const https = require('https')
 
-cloud.init();
-
-const cache = new Map();
-const TTL = 10 * 1000;
-
-function getCache(key) {
-  const v = cache.get(key);
-  if (!v) return null;
-  if (Date.now() - v.t > TTL) {
-    cache.delete(key);
-    return null;
-  }
-  return v.data;
-}
-
-function setCache(key, data) {
-  cache.set(key, { t: Date.now(), data });
-}
-
-function fetchText(url) {
+function httpsGet(url) {
   return new Promise((resolve, reject) => {
-    https
-      .get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-        let data = '';
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-        res.on('end', () => {
-          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(data);
-          } else {
-            reject(new Error(`status ${res.statusCode}`));
-          }
-        });
-      })
-      .on('error', reject);
-  });
+    https.get(url, (res) => {
+      let data = ''
+      res.on('data', (chunk) => (data += chunk))
+      res.on('end', () => resolve({ statusCode: res.statusCode, data }))
+    }).on('error', reject)
+  })
 }
 
-exports.main = async (event) => {
-  const { code } = event;
-  if (!code || !/\d{6}/.test(code)) {
-    return { ok: false, error: 'invalid code' };
+exports.main = async (event, context) => {
+  const code = String(event.code || '').trim()
+  if (!/^\d{6}$/.test(code)) {
+    return { ok: false, error: 'invalid code', code }
   }
 
-  const cacheKey = `gz:${code}`;
-  const c = getCache(cacheKey);
-  if (c) return { ok: true, data: c };
-
-  const url = `https://fundgz.1234567.com.cn/js/${code}.js?rt=${Date.now()}`;
+  const url = `https://fundgz.1234567.com.cn/js/${code}.js?rt=${Date.now()}`
 
   try {
-    const text = await fetchText(url);
-    const m = text.match(/jsonpgz\(([\s\S]*?)\);?/);
+    const { statusCode, data } = await httpsGet(url)
+
+    // 返回格式大概是：jsonpgz({...});
+    const m = data.match(/jsonpgz\((\{.*\})\);?/)
     if (!m) {
-      return { ok: false, error: 'parse_failed', raw: text };
+      return { ok: false, error: 'unexpected response', statusCode, raw: data.slice(0, 200) }
     }
-    const data = JSON.parse(m[1]);
-    setCache(cacheKey, data);
-    return { ok: true, data };
+
+    const obj = JSON.parse(m[1])
+    return { ok: true, data: obj }
   } catch (e) {
-    return { ok: false, error: 'fetch_failed', message: String(e) };
+    return { ok: false, error: String(e && e.message ? e.message : e) }
   }
-};
+}
