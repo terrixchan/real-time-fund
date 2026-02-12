@@ -79,3 +79,6 @@ fabric.properties
 
 /node_modules/
 /.next/
+
+# macOS metadata
+.DS_Store
